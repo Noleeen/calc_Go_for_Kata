@@ -10,28 +10,34 @@ import (
 )
 
 func main() {
-	expression := inputUser()
-	sentence := strings.Join(expression, " ")
-	sentence = strings.ToUpper(sentence)
-	check := checkIntOrRom(expression)
+	for {
+		expression := inputUser()
+		sentence := strings.Join(expression, " ")
+		sentence = strings.ToUpper(sentence)
+		check := checkIntOrRom(expression)
 
-	if check == 7 {
-		fmt.Println("inout error: expression must be of two operands and one operator")
-	} else if check == 1 { // выражение с целыми числами
-		fmt.Println("int")
+		if check == 7 {
+			fmt.Println("inout error: expression must be of two operands and one operator")
+		} else if check == 1 { // выражение с целыми числами
+			resultInt, err := operations(intNum(expression))
+			if err == nil {
+				fmt.Println(sentence, " = ", resultInt)
+			} else {
+				fmt.Println(err)
+			}
 
-	} else if check == 2 { // выражение с римскими числами
-		roman, err := operations(toRomanNum(expression))
-		resultRoman := toIntNum(roman)
-		if err == nil {
-			fmt.Println(sentence, " = ", resultRoman)
-		} else {
-			fmt.Println(err)
+		} else if check == 2 { // выражение с римскими числами
+			roman, err := operations(toRomanNum(expression))
+			resultRoman := toIntNum(roman)
+			if err == nil {
+				fmt.Println(sentence, " = ", resultRoman)
+			} else {
+				fmt.Println(err)
+			}
+
+		} else if check == 0 { // в выражении разные типы чисел
+			fmt.Println("input error: operands are different types")
 		}
-		fmt.Println()
-
-	} else if check == 0 { // в выражении разные типы чисел
-		fmt.Println("input error: operands are different types")
 	}
 }
 
@@ -39,12 +45,22 @@ func inputUser() []string {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("\nCalc produces one action (+, -, *, /) with integer numbers (1-10) or roman numerals (I-X).   ")
-	fmt.Println("Enter your expression separated by space \n(Example: 5 * 2, x - ii): \n")
+	fmt.Println("Enter your expression separated by space \n(Example: 5 * 2, x - ii):")
 	text, _ := reader.ReadString('\n')
 	text = strings.TrimSpace(text)
 
 	arr := strings.Split(text, " ")
 	return arr
+}
+
+func intNum(arr []string) (a, b int, c string) {
+	num1 := strings.TrimSpace(arr[0])
+	num2 := strings.TrimSpace(arr[2])
+	a, _ = strconv.Atoi(num1)
+	b, _ = strconv.Atoi(num2)
+	c = arr[1]
+	return a, b, c
+
 }
 
 func checkIntOrRom(arr []string) int {

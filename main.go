@@ -11,15 +11,20 @@ import (
 
 func main() {
 	expression := inputUser()
-	check := checkInt(expression)
+	sentence := strings.Join(expression, " ")
+	sentence = strings.ToUpper(sentence)
+	check := checkIntOrRom(expression)
 
-	if check == 1 { // выражение с целыми числами
+	if check == 7 {
+		fmt.Println("inout error: expression must be of two operands and one operator")
+	} else if check == 1 { // выражение с целыми числами
 		fmt.Println("int")
 
 	} else if check == 2 { // выражение с римскими числами
-		roman, err := operations(romanNum(expression))
+		roman, err := operations(toRomanNum(expression))
+		resultRoman := toIntNum(roman)
 		if err == nil {
-			fmt.Println(expression, " = ", roman)
+			fmt.Println(sentence, " = ", resultRoman)
 		} else {
 			fmt.Println(err)
 		}
@@ -33,8 +38,8 @@ func main() {
 func inputUser() []string {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("Calc produces one action (+, -, *, /) with integer numbers (1-10) or roman numerals (I-X). \nExample: 5 * 2, x - ii  ")
-	fmt.Println("Enter your expression: ")
+	fmt.Println("\nCalc produces one action (+, -, *, /) with integer numbers (1-10) or roman numerals (I-X).   ")
+	fmt.Println("Enter your expression separated by space \n(Example: 5 * 2, x - ii): \n")
 	text, _ := reader.ReadString('\n')
 	text = strings.TrimSpace(text)
 
@@ -42,7 +47,11 @@ func inputUser() []string {
 	return arr
 }
 
-func checkInt(arr []string) int {
+func checkIntOrRom(arr []string) int {
+
+	if len(arr) != 3 {
+		return 7
+	}
 
 	num1 := strings.TrimSpace(arr[0])
 	num2 := strings.TrimSpace(arr[2])
@@ -70,7 +79,7 @@ func checkInt(arr []string) int {
 
 }
 
-func romanNum(arr []string) (a, b int, c string) {
+func toRomanNum(arr []string) (a, b int, c string) {
 	convertRoman := map[string]int{
 		"i":   1,
 		"ii":  2,
@@ -89,19 +98,62 @@ func romanNum(arr []string) (a, b int, c string) {
 	return a, b, c
 }
 
+func toIntNum(res int) string {
+	if res > 0 {
+		convertInt1 := map[int]string{
+			0: "",
+			1: "I",
+			2: "II",
+			3: "III",
+			4: "IV",
+			5: "V",
+			6: "VI",
+			7: "VII",
+			8: "IIX",
+			9: "IX",
+		}
+		convertIntX := map[int]string{
+			0:  "",
+			1:  "X",
+			2:  "XX",
+			3:  "XXX",
+			4:  "XL",
+			5:  "L",
+			6:  "LX",
+			7:  "LXX",
+			8:  "LXXX",
+			9:  "XC",
+			10: "C",
+		}
+		resX := res / 10
+		res1 := res % 10
+		res11 := convertInt1[res1]
+		resXX := convertIntX[resX]
+
+		fin := resXX + res11
+		return fin
+	} else {
+		return "Error: Roman numerals cannot be less than zero"
+	}
+}
+
 func operations(a, b int, c string) (int, error) {
 	var result int
-	switch c {
-	case "+":
-		result = a + b
-	case "-":
-		result = a - b
-	case "*":
-		result = a * b
-	case "/":
-		result = a / b
-	default:
-		return 0, errors.New("input error: incorrect operator")
+	if a <= 10 && a > 0 && b <= 10 && b > 0 {
+		switch c {
+		case "+":
+			result = a + b
+		case "-":
+			result = a - b
+		case "*":
+			result = a * b
+		case "/":
+			result = a / b
+		default:
+			return 0, errors.New("input error: incorrect operator")
+		}
+		return result, nil
+	} else {
+		return 0, errors.New("input error: incorrect operand (1-10 or I-X)")
 	}
-	return result, nil
 }

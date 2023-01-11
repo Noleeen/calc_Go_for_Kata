@@ -108,6 +108,8 @@ func toRomanNum(arr []string) (a, b int, c string) {
 		"ix":  9,
 		"x":   10,
 	}
+	arr[0] = strings.ToLower(arr[0])
+	arr[2] = strings.ToLower(arr[2])
 	a = convertRoman[arr[0]]
 	b = convertRoman[arr[2]]
 	c = arr[1]
